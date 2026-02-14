@@ -131,11 +131,126 @@ npm run build
 
 ## Docker Alternative
 
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- No other services using ports **8080**, **3307**, or **5173**
+
+### Architecture
+
+| Container          | Service               | Port              |
+| ------------------ | --------------------- | ----------------- |
+| `ecommerce-nginx`  | Nginx reverse proxy   | `localhost:8080`  |
+| `ecommerce-app`    | PHP 8.2-FPM (Laravel) | internal :9000    |
+| `ecommerce-mysql`  | MySQL 8.0             | `localhost:3307`  |
+| `ecommerce-node`   | Vite asset builder    | (exits on finish) |
+
+> **Note:** The `.env` file stays configured for local (Laragon) development. Docker-specific values (DB_HOST, DB_PASSWORD, etc.) are overridden via `environment:` in `docker-compose.yml`, so switching between local and Docker won't break either setup.
+
+### Step 1 — Build & Start
+
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
-Access: http://localhost:8080
+Wait for the `ecommerce-node` container to finish building assets (it will exit after `npm run build`). Check progress:
+
+```bash
+docker compose logs node --follow
+```
+
+### Step 2 — Install Dependencies & Setup
+
+```bash
+# Fix vendor permissions (needed for the volume mount)
+docker compose exec --user root app chown -R appuser:www-data /var/www/vendor
+
+# Install PHP dependencies
+docker compose exec app composer install --no-interaction
+
+# Generate app key
+docker compose exec app php artisan key:generate --force
+
+# Run migrations & seed central database
+docker compose exec app php artisan migrate --seed --force
+
+# Create storage symlink
+docker compose exec app php artisan storage:link --force
+```
+
+### Step 3 — Access the Application
+
+Open in browser: **http://localhost:8080**
+
+To access via `ecommerce.test:8080`, add to your hosts file:
+```
+127.0.0.1 ecommerce.test
+```
+
+### Docker — Useful Commands
+
+```bash
+# View container status
+docker compose ps
+
+# View application logs
+docker compose logs app --tail 50
+docker compose logs nginx --tail 50
+
+# Enter the PHP container shell
+docker compose exec app bash
+
+# Run artisan commands
+docker compose exec app php artisan <command>
+
+# Run tests inside Docker
+docker compose exec app php artisan test
+
+# Rebuild assets after frontend changes
+docker compose restart node
+
+# Stop all containers
+docker compose down
+
+# Stop and remove all data (databases, volumes)
+docker compose down -v
+```
+
+### Docker — Troubleshooting
+
+#### Blank page (no styles/scripts)
+
+Assets haven't been built yet. Check if the node container finished:
+```bash
+docker compose logs node --tail 5
+```
+If needed, rebuild:
+```bash
+docker compose restart node
+```
+
+#### "Class not found" errors
+
+Vendor volume may be empty. Run:
+```bash
+docker compose exec --user root app chown -R appuser:www-data /var/www/vendor
+docker compose exec app composer install --no-interaction
+```
+
+#### Cannot connect to MySQL
+
+Ensure the MySQL container is healthy:
+```bash
+docker compose ps
+```
+If unhealthy, restart:
+```bash
+docker compose restart mysql
+```
+
+#### Port conflict
+
+If port 8080 or 3307 is in use, edit `docker-compose.yml` ports section. For example change `"8080:80"` to `"8081:80"`.
 
 ---
 

@@ -18,5 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo('/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->renderable(function (\Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException $e) {
+            abort(404);
+        });
     })->create();

@@ -111,10 +111,32 @@ server {
 ### Docker Alternative
 
 ```bash
-docker-compose up -d --build
+# Build & start all containers
+docker compose up -d --build
+
+# Wait for node to finish building assets
+docker compose logs node --follow
+
+# Setup Laravel inside the container
+docker compose exec --user root app chown -R appuser:www-data /var/www/vendor
+docker compose exec app composer install --no-interaction
+docker compose exec app php artisan key:generate --force
+docker compose exec app php artisan migrate --seed --force
+docker compose exec app php artisan storage:link --force
 ```
 
 Access: http://localhost:8080
+
+| Container          | Service               | Port              |
+| ------------------ | --------------------- | ----------------- |
+| `ecommerce-nginx`  | Nginx reverse proxy   | `localhost:8080`  |
+| `ecommerce-app`    | PHP 8.2-FPM (Laravel) | internal :9000    |
+| `ecommerce-mysql`  | MySQL 8.0             | `localhost:3307`  |
+| `ecommerce-node`   | Vite asset builder    | (exits on finish) |
+
+> `.env` stays configured for local dev. Docker overrides DB_HOST, DB_PASSWORD, etc. via `docker-compose.yml` environment variables.
+>
+> **For detailed Docker setup & troubleshooting, see [INSTALL.md](INSTALL.md).**
 
 ### Demo Credentials (per Tenant)
 

@@ -19,6 +19,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: ecommerce-app
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ecommerce_central
+      DB_USERNAME: root
+      DB_PASSWORD: secret
+      REDIS_HOST: redis
+      APP_URL: http://ecommerce.test:8080
+      TENANCY_CENTRAL_DOMAINS: "ecommerce.test,localhost"
     volumes:
       - ./:/var/www
       - vendor_data:/var/www/vendor
@@ -49,16 +58,14 @@ services:
     networks:
       - ecommerce
 
-  # Node.js for Vite dev server
+  # Node.js for building Vite assets
   node:
     image: node:20-alpine
     container_name: ecommerce-node
     working_dir: /var/www
     volumes:
       - ./:/var/www
-    ports:
-      - "5173:5173"
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    command: sh -c "npm install && npm run build"
     networks:
       - ecommerce
 
