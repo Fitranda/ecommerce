@@ -26,8 +26,9 @@ services:
       DB_USERNAME: root
       DB_PASSWORD: secret
       REDIS_HOST: redis
-      APP_URL: http://ecommerce.test:8080
-      TENANCY_CENTRAL_DOMAINS: "ecommerce.test,localhost"
+      APP_URL: http://ecommerce.lvh.me:8080
+      TENANCY_CENTRAL_DOMAINS: "ecommerce.lvh.me"
+      SESSION_DOMAIN: ".ecommerce.lvh.me"
     volumes:
       - ./:/var/www
       - vendor_data:/var/www/vendor

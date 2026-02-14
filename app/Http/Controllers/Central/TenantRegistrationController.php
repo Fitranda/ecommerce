@@ -56,7 +56,10 @@ class TenantRegistrationController extends Controller
         // Auto-add subdomain to Windows hosts file for local development
         $this->addToHostsFile($validated['subdomain'] . '.' . config('tenancy.central_domains')[0]);
 
-        $tenantUrl = 'http://' . $validated['subdomain'] . '.' . config('tenancy.central_domains')[0];
+        $centralDomain = config('tenancy.central_domains')[0];
+        $appUrlParts = parse_url(config('app.url'));
+        $port = isset($appUrlParts['port']) ? ':' . $appUrlParts['port'] : '';
+        $tenantUrl = 'http://' . $validated['subdomain'] . '.' . $centralDomain . $port;
 
         return redirect()->away($tenantUrl . '/login?welcome=1');
     }
