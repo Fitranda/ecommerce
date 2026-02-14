@@ -124,7 +124,7 @@ class ProductTest extends TenantTestCase
                 'name' => '',
                 'price' => -1,
             ])
-            ->assertSessionHasErrors(['name', 'price', 'category_id']);
+            ->assertSessionHasErrors(['name', 'price', 'stock']);
     }
 
     public function test_storefront_shows_active_products(): void

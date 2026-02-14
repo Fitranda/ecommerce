@@ -1,64 +1,69 @@
 <template>
   <StorefrontLayout>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">Products</h1>
+    <v-container style="max-width: 1200px;" class="py-8">
+      <h1 class="text-h4 font-weight-bold mb-6" style="color: #1E1B4B;">Products</h1>
 
       <!-- Filters -->
-      <div class="flex flex-wrap gap-4 mb-6">
-        <input v-model="localFilters.search" type="text" placeholder="Search products..."
-               class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border text-sm" />
-        <select v-model="localFilters.category" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border text-sm">
-          <option value="">All Categories</option>
-          <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-        </select>
-        <button @click="applyFilters" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700">Filter</button>
-        <button @click="resetFilters" class="text-gray-600 px-4 py-2 rounded-md text-sm hover:bg-gray-100 border">Reset</button>
-      </div>
+      <v-card variant="outlined" class="pa-4 mb-6" style="border: 2px solid #EDE9FE;">
+        <v-row align="center" no-gutters class="ga-3">
+          <v-col cols="12" sm="4">
+            <v-text-field v-model="localFilters.search" placeholder="Search products..." prepend-inner-icon="mdi-magnify" hide-details density="compact" />
+          </v-col>
+          <v-col cols="12" sm="3">
+            <v-select v-model="localFilters.category" :items="categoryOptions" item-title="name" item-value="id" placeholder="All Categories" clearable hide-details density="compact" />
+          </v-col>
+          <v-col cols="auto">
+            <v-btn color="primary" @click="applyFilters" prepend-icon="mdi-filter" rounded="pill">Filter</v-btn>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn variant="outlined" color="grey" @click="resetFilters" prepend-icon="mdi-refresh" rounded="pill">Reset</v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
 
       <!-- Products Grid -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <a v-for="product in products.data" :key="product.id"
-           :href="`/products/${product.slug}`"
-           class="bg-white rounded-lg border hover:shadow-md transition overflow-hidden">
-          <div class="aspect-square bg-gray-100 flex items-center justify-center">
-            <img v-if="product.image" :src="`/storage/${product.image}`" :alt="product.name" class="w-full h-full object-cover" />
-            <svg v-else class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <div class="p-4">
-            <h3 class="text-sm font-medium text-gray-900 truncate">{{ product.name }}</h3>
-            <p class="text-sm text-gray-500">{{ product.category?.name }}</p>
-            <div class="flex justify-between items-center mt-2">
-              <p class="text-lg font-bold text-indigo-600">${{ Number(product.price).toFixed(2) }}</p>
-              <span v-if="product.stock <= 0" class="text-xs text-red-600 font-medium">Out of stock</span>
-              <span v-else-if="product.stock <= 5" class="text-xs text-orange-600 font-medium">Low stock</span>
-            </div>
-          </div>
-        </a>
-      </div>
+      <v-row>
+        <v-col v-for="product in products.data" :key="product.id" cols="6" md="3">
+          <v-card :href="`/products/${product.slug}`" hover class="product-card h-100" variant="outlined" style="border: 2px solid #F3F4F6;">
+            <v-img :src="product.image ? `/storage/${product.image}` : ''" aspect-ratio="1" cover class="bg-grey-lighten-4">
+              <template v-if="!product.image" v-slot:placeholder>
+                <div class="d-flex align-center justify-center fill-height">
+                  <v-icon icon="mdi-image-off" size="48" color="grey-lighten-2" />
+                </div>
+              </template>
+              <v-chip v-if="product.stock <= 0" color="error" size="small" class="ma-2" variant="flat">Out of stock</v-chip>
+              <v-chip v-else-if="product.stock <= 5" color="warning" size="small" class="ma-2" variant="flat">Low stock</v-chip>
+            </v-img>
+            <v-card-text class="pb-1">
+              <p class="text-caption text-grey-darken-1 mb-1">{{ product.category?.name }}</p>
+              <h3 class="text-subtitle-2 font-weight-bold text-truncate" style="color: #1E1B4B;">{{ product.name }}</h3>
+            </v-card-text>
+            <v-card-actions class="pt-0 px-4 pb-4">
+              <span class="text-h6 font-weight-black text-primary">${{ Number(product.price).toFixed(2) }}</span>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
 
-      <div v-if="!products.data.length" class="text-center py-12 text-gray-500">
-        No products found.
+      <div v-if="!products.data.length" class="text-center py-12">
+        <v-icon icon="mdi-magnify-close" size="64" color="grey-lighten-2" />
+        <p class="text-body-1 text-grey mt-3">No products found.</p>
       </div>
 
       <!-- Pagination -->
-      <div v-if="products.links && products.links.length > 3" class="mt-8 flex justify-center space-x-1">
+      <div v-if="products.links && products.links.length > 3" class="d-flex justify-center mt-8 ga-1">
         <template v-for="link in products.links" :key="link.label">
-          <a v-if="link.url"
-             :href="link.url"
-             v-html="link.label"
-             :class="[link.active ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50', 'px-3 py-2 border rounded-md text-sm']" />
-          <span v-else v-html="link.label" class="px-3 py-2 border rounded-md text-sm text-gray-400 bg-gray-50" />
+          <v-btn v-if="link.url" :href="link.url" :color="link.active ? 'primary' : 'grey-lighten-3'" :variant="link.active ? 'flat' : 'outlined'" size="small" rounded="lg" v-html="link.label" min-width="40" />
+          <v-btn v-else variant="text" size="small" disabled v-html="link.label" min-width="40" />
         </template>
       </div>
-    </div>
+    </v-container>
   </StorefrontLayout>
 </template>
 
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -67,9 +72,11 @@ const props = defineProps({
   filters: { type: Object, default: () => ({}) },
 });
 
+const categoryOptions = computed(() => props.categories.map(c => ({ id: c.id, name: c.name })));
+
 const localFilters = reactive({
   search: props.filters.search || '',
-  category: props.filters.category || '',
+  category: props.filters.category || null,
 });
 
 function applyFilters() {
@@ -81,7 +88,12 @@ function applyFilters() {
 
 function resetFilters() {
   localFilters.search = '';
-  localFilters.category = '';
+  localFilters.category = null;
   router.get('/products');
 }
 </script>
+
+<style scoped>
+.product-card { transition: all 0.3s ease; }
+.product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(124, 58, 237, 0.12) !important; }
+</style>

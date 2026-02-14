@@ -2,65 +2,70 @@
   <AdminLayout>
     <template #header>Products</template>
 
-    <div class="mb-6 flex justify-between items-center">
-      <div class="flex gap-3">
-        <input v-model="localFilters.search" type="text" placeholder="Search products..." class="border-gray-300 rounded-md shadow-sm px-3 py-2 border text-sm" />
-        <select v-model="localFilters.category" class="border-gray-300 rounded-md shadow-sm px-3 py-2 border text-sm">
-          <option value="">All Categories</option>
-          <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-        </select>
-        <button @click="applyFilters" class="bg-gray-600 text-white px-4 py-2 rounded-md text-sm hover:bg-gray-700">Filter</button>
-      </div>
-      <a href="/admin/products/create" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700">Add Product</a>
-    </div>
+    <v-card variant="outlined" class="pa-4 mb-6" style="border: 2px solid #EDE9FE;">
+      <v-row align="center" no-gutters class="ga-3">
+        <v-col cols="12" sm="4">
+          <v-text-field v-model="localFilters.search" placeholder="Search products..." prepend-inner-icon="mdi-magnify" hide-details density="compact" />
+        </v-col>
+        <v-col cols="12" sm="3">
+          <v-select v-model="localFilters.category" :items="categoryOptions" item-title="name" item-value="id" placeholder="All Categories" clearable hide-details density="compact" />
+        </v-col>
+        <v-col cols="auto">
+          <v-btn color="primary" @click="applyFilters" prepend-icon="mdi-filter" rounded="pill">Filter</v-btn>
+        </v-col>
+        <v-spacer />
+        <v-col cols="auto">
+          <v-btn href="/admin/products/create" color="primary" prepend-icon="mdi-plus" rounded="pill">Add Product</v-btn>
+        </v-col>
+      </v-row>
+    </v-card>
 
-    <div class="bg-white rounded-lg border overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+    <v-card variant="outlined" style="border: 2px solid #EDE9FE;">
+      <v-table hover>
+        <thead style="background: #F5F3FF;">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Price</th>
-            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stock</th>
-            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+            <th>Product</th>
+            <th>Category</th>
+            <th class="text-right">Price</th>
+            <th class="text-right">Stock</th>
+            <th class="text-center">Status</th>
+            <th class="text-right">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200">
-          <tr v-for="product in products.data" :key="product.id" class="hover:bg-gray-50">
-            <td class="px-4 py-3">
-              <div class="flex items-center">
-                <div class="w-10 h-10 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center overflow-hidden mr-3">
-                  <img v-if="product.image" :src="`/storage/${product.image}`" class="w-full h-full object-cover" />
-                  <span v-else class="text-gray-400 text-xs">IMG</span>
-                </div>
-                <span class="text-sm font-medium text-gray-900">{{ product.name }}</span>
+        <tbody>
+          <tr v-for="product in products.data" :key="product.id">
+            <td>
+              <div class="d-flex align-center py-2">
+                <v-avatar size="40" rounded="lg" class="mr-3 bg-grey-lighten-4">
+                  <v-img v-if="product.image" :src="`/storage/${product.image}`" cover />
+                  <v-icon v-else icon="mdi-image-off" size="20" color="grey-lighten-2" />
+                </v-avatar>
+                <span class="font-weight-bold" style="color: #1E1B4B;">{{ product.name }}</span>
               </div>
             </td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ product.category?.name || '-' }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 text-right">${{ Number(product.price).toFixed(2) }}</td>
-            <td class="px-4 py-3 text-sm text-right" :class="product.stock <= 5 ? 'text-orange-600 font-medium' : 'text-gray-600'">{{ product.stock }}</td>
-            <td class="px-4 py-3 text-center">
-              <span :class="product.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" class="inline-flex px-2 py-1 text-xs font-medium rounded-full">
-                {{ product.is_active ? 'Active' : 'Inactive' }}
-              </span>
+            <td class="text-grey-darken-1">{{ product.category?.name || '-' }}</td>
+            <td class="text-right font-weight-bold">${{ Number(product.price).toFixed(2) }}</td>
+            <td class="text-right">
+              <v-chip :color="product.stock <= 5 ? 'warning' : 'success'" variant="tonal" size="small">{{ product.stock }}</v-chip>
             </td>
-            <td class="px-4 py-3 text-right space-x-2">
-              <a :href="`/admin/products/${product.id}/edit`" class="text-indigo-600 hover:text-indigo-800 text-sm">Edit</a>
-              <button @click="deleteProduct(product)" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+            <td class="text-center">
+              <v-chip :color="product.is_active ? 'success' : 'grey'" variant="flat" size="small">{{ product.is_active ? 'Active' : 'Inactive' }}</v-chip>
+            </td>
+            <td class="text-right">
+              <v-btn :href="`/admin/products/${product.id}/edit`" variant="text" color="primary" size="small" icon><v-icon icon="mdi-pencil" /></v-btn>
+              <v-btn @click="deleteProduct(product)" variant="text" color="error" size="small" icon><v-icon icon="mdi-delete" /></v-btn>
             </td>
           </tr>
         </tbody>
-      </table>
-      <div v-if="!products.data.length" class="p-8 text-center text-gray-500">No products found.</div>
-    </div>
+      </v-table>
+      <div v-if="!products.data.length" class="pa-8 text-center text-grey">No products found.</div>
+    </v-card>
 
     <!-- Pagination -->
-    <div v-if="products.links && products.links.length > 3" class="mt-6 flex justify-center space-x-1">
+    <div v-if="products.links && products.links.length > 3" class="d-flex justify-center mt-6 ga-1">
       <template v-for="link in products.links" :key="link.label">
-        <a v-if="link.url" :href="link.url" v-html="link.label"
-           :class="[link.active ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50', 'px-3 py-2 border rounded-md text-sm']" />
-        <span v-else v-html="link.label" class="px-3 py-2 border rounded-md text-sm text-gray-400 bg-gray-50" />
+        <v-btn v-if="link.url" :href="link.url" :color="link.active ? 'primary' : 'grey-lighten-3'" :variant="link.active ? 'flat' : 'outlined'" size="small" rounded="lg" v-html="link.label" min-width="40" />
+        <v-btn v-else variant="text" size="small" disabled v-html="link.label" min-width="40" />
       </template>
     </div>
   </AdminLayout>
@@ -68,7 +73,7 @@
 
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -77,9 +82,11 @@ const props = defineProps({
   filters: { type: Object, default: () => ({}) },
 });
 
+const categoryOptions = computed(() => props.categories.map(c => ({ id: c.id, name: c.name })));
+
 const localFilters = reactive({
   search: props.filters.search || '',
-  category: props.filters.category || '',
+  category: props.filters.category || null,
 });
 
 function applyFilters() {

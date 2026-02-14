@@ -4,14 +4,29 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DataIsolationTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function tearDown(): void
+    {
+        // Clean up MySQL tenant databases created during tests
+        DB::statement('DROP DATABASE IF EXISTS tenant_store1');
+        DB::statement('DROP DATABASE IF EXISTS tenant_store2');
+        DB::statement('DROP DATABASE IF EXISTS tenant_newstore');
+
+        parent::tearDown();
+    }
+
     public function test_each_tenant_gets_separate_database(): void
     {
+        // Drop leftover databases from previous runs
+        DB::statement('DROP DATABASE IF EXISTS tenant_store1');
+        DB::statement('DROP DATABASE IF EXISTS tenant_store2');
+
         $tenant1 = Tenant::create([
             'id' => 'store1',
             'name' => 'Store One',
@@ -28,17 +43,21 @@ class DataIsolationTest extends TestCase
 
         $this->assertNotEquals($tenant1->id, $tenant2->id);
 
-        // Verify each tenant has its own database
+        // Verify each tenant has its own record in central DB
         $this->assertDatabaseHas('tenants', ['id' => 'store1']);
         $this->assertDatabaseHas('tenants', ['id' => 'store2']);
 
-        // Clean up tenant databases
-        $tenant1->delete();
-        $tenant2->delete();
+        // Verify actual MySQL databases were created
+        $databases = DB::select('SHOW DATABASES');
+        $dbNames = array_map(fn ($db) => $db->Database, $databases);
+        $this->assertContains('tenant_store1', $dbNames);
+        $this->assertContains('tenant_store2', $dbNames);
     }
 
     public function test_tenant_registration_creates_domain(): void
     {
+        DB::statement('DROP DATABASE IF EXISTS tenant_newstore');
+
         $tenant = Tenant::create([
             'id' => 'newstore',
             'name' => 'New Store',
@@ -49,9 +68,8 @@ class DataIsolationTest extends TestCase
         $tenant->domains()->create(['domain' => 'newstore']);
 
         $this->assertDatabaseHas('domains', [
-            'domain' => 'newstore.ecommerce.test',
+            'domain' => 'newstore',
+            'tenant_id' => 'newstore',
         ]);
-
-        $tenant->delete();
     }
 }

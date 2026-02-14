@@ -30,6 +30,7 @@ class AuthController extends Controller
 
             // Merge guest cart into user cart
             $sessionId = $request->session()->getId();
+            /** @var \App\Models\Tenant\User $user */
             $user = Auth::user();
             $userCart = Cart::getCart(userId: $user->id);
             $userCart->mergeGuestCart($sessionId);

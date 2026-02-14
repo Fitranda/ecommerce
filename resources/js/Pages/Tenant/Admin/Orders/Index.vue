@@ -2,59 +2,52 @@
   <AdminLayout>
     <template #header>Orders</template>
 
-    <div class="mb-6 flex gap-3">
-      <input v-model="localFilters.search" @keyup.enter="applyFilters" type="text" placeholder="Search by order number..." class="border-gray-300 rounded-md shadow-sm px-3 py-2 border text-sm" />
-      <select v-model="localFilters.status" @change="applyFilters" class="border-gray-300 rounded-md shadow-sm px-3 py-2 border text-sm">
-        <option value="">All Statuses</option>
-        <option value="pending">Pending</option>
-        <option value="processing">Processing</option>
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-    </div>
+    <v-card variant="outlined" class="pa-4 mb-6" style="border: 2px solid #EDE9FE;">
+      <v-row align="center" no-gutters class="ga-3">
+        <v-col cols="12" sm="4">
+          <v-text-field v-model="localFilters.search" @keyup.enter="applyFilters" placeholder="Search by order number..." prepend-inner-icon="mdi-magnify" hide-details density="compact" />
+        </v-col>
+        <v-col cols="12" sm="3">
+          <v-select v-model="localFilters.status" :items="statusItems" @update:model-value="applyFilters" placeholder="All Statuses" clearable hide-details density="compact" />
+        </v-col>
+      </v-row>
+    </v-card>
 
-    <div class="bg-white rounded-lg border overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+    <v-card variant="outlined" style="border: 2px solid #EDE9FE;">
+      <v-table hover>
+        <thead style="background: #F5F3FF;">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
-            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+            <th>Order</th>
+            <th>Customer</th>
+            <th class="text-right">Total</th>
+            <th class="text-center">Status</th>
+            <th>Date</th>
+            <th class="text-right">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200">
-          <tr v-for="order in orders.data" :key="order.id" class="hover:bg-gray-50">
-            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ order.order_number }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ order.user?.name || 'N/A' }}</td>
-            <td class="px-4 py-3 text-sm font-medium text-gray-900 text-right">${{ Number(order.total_amount).toFixed(2) }}</td>
-            <td class="px-4 py-3 text-center">
-              <select :value="order.status" @change="updateStatus(order, $event.target.value)"
-                      :class="statusClass(order.status)" class="text-xs font-medium rounded-full px-2 py-1 border-0 cursor-pointer">
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+        <tbody>
+          <tr v-for="order in orders.data" :key="order.id">
+            <td class="font-weight-bold" style="color: #1E1B4B;">{{ order.order_number }}</td>
+            <td class="text-grey-darken-1">{{ order.user?.name || 'N/A' }}</td>
+            <td class="text-right font-weight-bold">${{ Number(order.total_amount).toFixed(2) }}</td>
+            <td class="text-center">
+              <v-select :model-value="order.status" @update:model-value="updateStatus(order, $event)" :items="statusItems" hide-details density="compact" variant="outlined" style="max-width: 150px; margin: 0 auto;" />
             </td>
-            <td class="px-4 py-3 text-sm text-gray-500">{{ new Date(order.created_at).toLocaleDateString() }}</td>
-            <td class="px-4 py-3 text-right">
-              <a :href="`/admin/orders/${order.id}`" class="text-indigo-600 hover:text-indigo-800 text-sm">View</a>
+            <td class="text-grey-darken-1">{{ new Date(order.created_at).toLocaleDateString() }}</td>
+            <td class="text-right">
+              <v-btn :href="`/admin/orders/${order.id}`" variant="text" color="primary" size="small" icon><v-icon icon="mdi-eye" /></v-btn>
             </td>
           </tr>
         </tbody>
-      </table>
-      <div v-if="!orders.data.length" class="p-8 text-center text-gray-500">No orders found.</div>
-    </div>
+      </v-table>
+      <div v-if="!orders.data.length" class="pa-8 text-center text-grey">No orders found.</div>
+    </v-card>
 
     <!-- Pagination -->
-    <div v-if="orders.links && orders.links.length > 3" class="mt-6 flex justify-center space-x-1">
+    <div v-if="orders.links && orders.links.length > 3" class="d-flex justify-center mt-6 ga-1">
       <template v-for="link in orders.links" :key="link.label">
-        <a v-if="link.url" :href="link.url" v-html="link.label"
-           :class="[link.active ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50', 'px-3 py-2 border rounded-md text-sm']" />
-        <span v-else v-html="link.label" class="px-3 py-2 border rounded-md text-sm text-gray-400 bg-gray-50" />
+        <v-btn v-if="link.url" :href="link.url" :color="link.active ? 'primary' : 'grey-lighten-3'" :variant="link.active ? 'flat' : 'outlined'" size="small" rounded="lg" v-html="link.label" min-width="40" />
+        <v-btn v-else variant="text" size="small" disabled v-html="link.label" min-width="40" />
       </template>
     </div>
   </AdminLayout>
@@ -70,9 +63,11 @@ const props = defineProps({
   filters: { type: Object, default: () => ({}) },
 });
 
+const statusItems = ['pending', 'processing', 'completed', 'cancelled'];
+
 const localFilters = reactive({
   search: props.filters.search || '',
-  status: props.filters.status || '',
+  status: props.filters.status || null,
 });
 
 function applyFilters() {
@@ -84,15 +79,5 @@ function applyFilters() {
 
 function updateStatus(order, newStatus) {
   router.patch(`/admin/orders/${order.id}/status`, { status: newStatus }, { preserveScroll: true });
-}
-
-function statusClass(status) {
-  const classes = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    processing: 'bg-blue-100 text-blue-800',
-    completed: 'bg-green-100 text-green-800',
-    cancelled: 'bg-red-100 text-red-800',
-  };
-  return classes[status] || 'bg-gray-100 text-gray-800';
 }
 </script>

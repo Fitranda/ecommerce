@@ -14,14 +14,15 @@ class Order extends Model
         'user_id',
         'order_number',
         'status',
-        'total',
+        'total_amount',
         'notes',
         'shipping_name',
         'shipping_address',
+        'shipping_phone',
     ];
 
     protected $casts = [
-        'total' => 'decimal:2',
+        'total_amount' => 'decimal:2',
     ];
 
     protected static function booted(): void

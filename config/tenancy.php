@@ -32,7 +32,8 @@ return [
     ],
 
     /**
-     * Database tenancy config. Used by DatabaseTenancyBootstrapper.
+     * Database tenancy config.
+     * @see \Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper
      */
     'database' => [
         'central_connection' => env('DB_CONNECTION', 'central'),
@@ -44,8 +45,7 @@ return [
         'template_tenant_connection' => null,
 
         /**
-         * Tenant database names are created like this:
-         * prefix + tenant_id + suffix.
+         * Database names are created as: prefix + id + suffix.
          */
         'prefix' => 'tenant_',
         'suffix' => '',
@@ -73,7 +73,8 @@ return [
     ],
 
     /**
-     * Cache tenancy config. Used by CacheTenancyBootstrapper.
+     * Cache tenancy config.
+     * @see \Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper
      *
      * This works for all Cache facade calls, cache() helper
      * calls and direct calls to injected cache stores.
@@ -88,8 +89,9 @@ return [
     ],
 
     /**
-     * Filesystem tenancy config. Used by FilesystemTenancyBootstrapper.
-     * https://tenancyforlaravel.com/docs/v3/tenancy-bootstrappers/#filesystem-tenancy-boostrapper.
+     * Filesystem tenancy config.
+     * @see \Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper
+     * @link https://tenancyforlaravel.com/docs/v3/tenancy-bootstrappers/#filesystem-tenancy-boostrapper
      */
     'filesystem' => [
         /**
@@ -135,7 +137,8 @@ return [
     ],
 
     /**
-     * Redis tenancy config. Used by RedisTenancyBootstrapper.
+     * Redis tenancy config.
+     * @see \Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper
      *
      * Note: You need phpredis to use Redis tenancy.
      *

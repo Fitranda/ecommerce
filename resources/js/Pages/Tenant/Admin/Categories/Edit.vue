@@ -2,41 +2,24 @@
   <AdminLayout>
     <template #header>Edit Category</template>
 
-    <div class="max-w-lg">
-      <form @submit.prevent="submit" class="bg-white p-6 rounded-lg border space-y-5">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-          <input v-model="form.name" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-          <p class="text-red-500 text-sm mt-1" v-if="form.errors.name">{{ form.errors.name }}</p>
+    <v-card variant="outlined" class="pa-6" style="max-width: 600px; border: 2px solid #EDE9FE;">
+      <v-form @submit.prevent="submit">
+        <v-text-field v-model="form.name" label="Name" prepend-inner-icon="mdi-tag" :error-messages="form.errors.name" class="mb-1" />
+        <v-textarea v-model="form.description" label="Description" prepend-inner-icon="mdi-text" rows="3" class="mb-1" />
+
+        <div v-if="category.image" class="mb-4">
+          <v-img :src="`/storage/${category.image}`" width="80" height="80" cover rounded="lg" class="border" />
         </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <textarea v-model="form.description" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"></textarea>
-        </div>
+        <v-file-input @update:model-value="form.image = $event" label="Image" prepend-icon="" prepend-inner-icon="mdi-camera" accept="image/*" :error-messages="form.errors.image" class="mb-1" />
+        <v-checkbox v-model="form.is_active" label="Active" class="mb-4" />
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-          <div v-if="category.image" class="mb-2">
-            <img :src="`/storage/${category.image}`" class="w-20 h-20 object-cover rounded" />
-          </div>
-          <input type="file" @change="form.image = $event.target.files[0]" accept="image/*" class="text-sm" />
-          <p class="text-red-500 text-sm mt-1" v-if="form.errors.image">{{ form.errors.image }}</p>
+        <div class="d-flex justify-end ga-3">
+          <v-btn href="/admin/categories" variant="outlined" color="grey" rounded="pill">Cancel</v-btn>
+          <v-btn type="submit" color="primary" :loading="form.processing" rounded="pill" prepend-icon="mdi-content-save">Update Category</v-btn>
         </div>
-
-        <div class="flex items-center">
-          <input v-model="form.is_active" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" id="is_active" />
-          <label for="is_active" class="ml-2 text-sm text-gray-700">Active</label>
-        </div>
-
-        <div class="flex justify-end space-x-3">
-          <a href="/admin/categories" class="px-4 py-2 border rounded-md text-sm text-gray-700 hover:bg-gray-50">Cancel</a>
-          <button type="submit" :disabled="form.processing" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
-            {{ form.processing ? 'Saving...' : 'Update Category' }}
-          </button>
-        </div>
-      </form>
-    </div>
+      </v-form>
+    </v-card>
   </AdminLayout>
 </template>
 

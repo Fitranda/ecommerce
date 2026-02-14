@@ -1,58 +1,123 @@
 <template>
   <CentralLayout>
-    <div class="max-w-lg mx-auto py-16 px-4">
-      <div class="bg-white p-8 rounded-lg shadow-sm border">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Create Your Store</h2>
+    <v-container style="max-width: 560px;" class="py-16">
+      <!-- Success Dialog -->
+      <v-dialog v-model="showSuccess" persistent max-width="480">
+        <v-card class="pa-8 text-center" rounded="xl">
+          <v-avatar size="80" color="success" variant="tonal" class="mb-4">
+            <v-icon icon="mdi-check-circle" size="48" />
+          </v-avatar>
+          <h2 class="text-h5 font-weight-bold mb-2" style="color: #1E1B4B;">Store Created!</h2>
+          <p class="text-body-1 text-grey-darken-1 mb-2">
+            <strong>{{ storeName }}</strong> has been created successfully.
+          </p>
+          <p class="text-body-2 text-grey mb-6">
+            Your store is ready. Click below to visit and log in with your admin credentials.
+          </p>
+          <v-btn :href="tenantUrl" color="primary" size="large" block rounded="pill" prepend-icon="mdi-open-in-new" class="mb-3">
+            Go to My Store
+          </v-btn>
+          <v-btn href="/" variant="text" color="grey" size="small">Back to Home</v-btn>
+        </v-card>
+      </v-dialog>
 
-        <form @submit.prevent="submit" class="space-y-5">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Store Name</label>
-            <input v-model="form.name" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" placeholder="My Awesome Store" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.name">{{ form.errors.name }}</p>
-          </div>
+      <v-card v-if="!success" class="pa-8" style="border: 2px solid #EDE9FE;">
+        <div class="text-center mb-6">
+          <v-avatar size="64" color="primary" variant="tonal" class="mb-3">
+            <v-icon icon="mdi-store-plus" size="32" />
+          </v-avatar>
+          <h2 class="text-h5 font-weight-bold" style="color: #1E1B4B;">Create Your Store</h2>
+          <p class="text-body-2 text-grey-darken-1 mt-1">Set up your eCommerce store in seconds</p>
+        </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Subdomain</label>
-            <div class="flex items-center">
-              <input v-model="form.subdomain" type="text" class="flex-1 border-gray-300 rounded-l-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" placeholder="mystore" />
-              <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r-md px-3 py-2 text-sm text-gray-500">.ecommerce.test</span>
-            </div>
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.subdomain">{{ form.errors.subdomain }}</p>
-          </div>
+        <v-form @submit.prevent="submit">
+          <v-text-field
+            v-model="form.store_name"
+            label="Store Name"
+            prepend-inner-icon="mdi-store"
+            placeholder="My Awesome Store"
+            :error-messages="form.errors.store_name"
+            class="mb-1"
+          />
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
-            <input v-model="form.email" type="email" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" placeholder="admin@example.com" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.email">{{ form.errors.email }}</p>
-          </div>
+          <v-text-field
+            v-model="form.subdomain"
+            label="Subdomain"
+            prepend-inner-icon="mdi-web"
+            placeholder="mystore"
+            suffix=".ecommerce.test"
+            :error-messages="form.errors.subdomain"
+            class="mb-1"
+          />
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Admin Password</label>
-            <input v-model="form.password" type="password" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" placeholder="••••••••" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.password">{{ form.errors.password }}</p>
-          </div>
+          <v-text-field
+            v-model="form.name"
+            label="Admin Name"
+            prepend-inner-icon="mdi-account"
+            placeholder="John Doe"
+            :error-messages="form.errors.name"
+            class="mb-1"
+          />
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-            <input v-model="form.password_confirmation" type="password" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" placeholder="••••••••" />
-          </div>
+          <v-text-field
+            v-model="form.email"
+            label="Admin Email"
+            type="email"
+            prepend-inner-icon="mdi-email"
+            placeholder="admin@example.com"
+            :error-messages="form.errors.email"
+            class="mb-1"
+          />
 
-          <button type="submit" :disabled="form.processing" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
-            {{ form.processing ? 'Creating Store...' : 'Create Store' }}
-          </button>
-        </form>
-      </div>
-    </div>
+          <v-text-field
+            v-model="form.password"
+            label="Admin Password"
+            type="password"
+            prepend-inner-icon="mdi-lock"
+            :error-messages="form.errors.password"
+            class="mb-1"
+          />
+
+          <v-text-field
+            v-model="form.password_confirmation"
+            label="Confirm Password"
+            type="password"
+            prepend-inner-icon="mdi-lock-check"
+            class="mb-4"
+          />
+
+          <v-btn type="submit" color="primary" block size="large" :loading="form.processing" rounded="pill" prepend-icon="mdi-rocket-launch">
+            Create Store
+          </v-btn>
+        </v-form>
+      </v-card>
+    </v-container>
   </CentralLayout>
 </template>
 
 <script setup>
 import CentralLayout from '@/Layouts/CentralLayout.vue';
 import { useForm } from '@inertiajs/vue3';
+import { ref, onMounted } from 'vue';
+
+const props = defineProps({
+  success: { type: Boolean, default: false },
+  tenantUrl: { type: String, default: '' },
+  storeName: { type: String, default: '' },
+});
+
+const showSuccess = ref(false);
+
+onMounted(() => {
+  if (props.success) {
+    showSuccess.value = true;
+  }
+});
 
 const form = useForm({
-  name: '',
+  store_name: '',
   subdomain: '',
+  name: '',
   email: '',
   password: '',
   password_confirmation: '',

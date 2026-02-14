@@ -1,43 +1,31 @@
 <template>
   <StorefrontLayout>
-    <div class="max-w-md mx-auto py-16 px-4">
-      <div class="bg-white p-8 rounded-lg shadow-sm border">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Create Account</h2>
+    <v-container style="max-width: 480px;" class="py-16">
+      <v-card class="pa-8" style="border: 2px solid #EDE9FE;">
+        <div class="text-center mb-6">
+          <v-avatar size="64" color="secondary" variant="tonal" class="mb-3">
+            <v-icon icon="mdi-account-plus" size="32" />
+          </v-avatar>
+          <h2 class="text-h5 font-weight-bold" style="color: #1E1B4B;">Create Account</h2>
+          <p class="text-body-2 text-grey-darken-1 mt-1">Join and start shopping</p>
+        </div>
 
-        <form @submit.prevent="submit" class="space-y-5">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-            <input v-model="form.name" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.name">{{ form.errors.name }}</p>
-          </div>
+        <v-form @submit.prevent="submit">
+          <v-text-field v-model="form.name" label="Name" prepend-inner-icon="mdi-account" :error-messages="form.errors.name" class="mb-1" />
+          <v-text-field v-model="form.email" label="Email" type="email" prepend-inner-icon="mdi-email" :error-messages="form.errors.email" class="mb-1" />
+          <v-text-field v-model="form.password" label="Password" type="password" prepend-inner-icon="mdi-lock" :error-messages="form.errors.password" class="mb-1" />
+          <v-text-field v-model="form.password_confirmation" label="Confirm Password" type="password" prepend-inner-icon="mdi-lock-check" class="mb-4" />
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input v-model="form.email" type="email" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.email">{{ form.errors.email }}</p>
-          </div>
+          <v-btn type="submit" color="primary" block size="large" :loading="form.processing" rounded="pill" prepend-icon="mdi-account-plus">
+            Register
+          </v-btn>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input v-model="form.password" type="password" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.password">{{ form.errors.password }}</p>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-            <input v-model="form.password_confirmation" type="password" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-          </div>
-
-          <button type="submit" :disabled="form.processing" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
-            {{ form.processing ? 'Creating account...' : 'Register' }}
-          </button>
-
-          <p class="text-center text-sm text-gray-600">
-            Already have an account? <a href="/login" class="text-indigo-600 hover:text-indigo-800">Sign In</a>
+          <p class="text-center text-body-2 text-grey-darken-1 mt-5">
+            Already have an account? <a href="/login" class="text-primary font-weight-bold text-decoration-none">Sign In</a>
           </p>
-        </form>
-      </div>
-    </div>
+        </v-form>
+      </v-card>
+    </v-container>
   </StorefrontLayout>
 </template>
 

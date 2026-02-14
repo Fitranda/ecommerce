@@ -1,65 +1,78 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col">
+  <v-app>
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center space-x-8">
-            <a href="/" class="text-xl font-bold text-indigo-600">
-              {{ tenant?.name || 'Store' }}
-            </a>
-            <div class="hidden md:flex space-x-4">
-              <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Home</a>
-              <a href="/products" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Products</a>
-            </div>
-          </div>
-          <div class="flex items-center space-x-4">
-            <a href="/cart" class="relative text-gray-700 hover:text-indigo-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-              </svg>
-            </a>
-            <template v-if="auth?.user">
-              <span class="text-sm text-gray-700">{{ auth.user.name }}</span>
-              <a v-if="auth.user.role === 'admin'" href="/admin/dashboard" class="text-sm text-indigo-600 hover:text-indigo-800">Admin</a>
-              <a href="/orders" class="text-sm text-gray-600 hover:text-indigo-600">My Orders</a>
-              <button @click="logout" class="text-sm text-red-600 hover:text-red-800">Logout</button>
-            </template>
-            <template v-else>
-              <a href="/login" class="text-sm text-gray-700 hover:text-indigo-600">Login</a>
-              <a href="/register" class="text-sm px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Register</a>
-            </template>
-          </div>
+    <v-app-bar flat elevation="1" color="white" class="border-b">
+      <v-container class="d-flex align-center py-0" style="max-width: 1200px;">
+        <a href="/" class="text-decoration-none d-flex align-center">
+          <v-avatar color="primary" size="36" class="mr-3">
+            <v-icon icon="mdi-shopping" color="white" size="20" />
+          </v-avatar>
+          <span class="text-h6 font-weight-bold" style="color: #7C3AED;">{{ tenant?.name || 'Store' }}</span>
+        </a>
+
+        <div class="d-none d-md-flex ml-8 ga-1">
+          <v-btn href="/" variant="text" color="primary" rounded="pill">Home</v-btn>
+          <v-btn href="/products" variant="text" color="primary" rounded="pill">Products</v-btn>
         </div>
-      </div>
-    </nav>
+
+        <v-spacer />
+
+        <v-btn href="/cart" icon variant="text" color="primary" class="mr-1">
+          <v-icon icon="mdi-cart-outline" />
+        </v-btn>
+
+        <template v-if="auth?.user">
+          <v-menu>
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" variant="tonal" color="primary" rounded="pill" class="ml-2">
+                <v-icon icon="mdi-account-circle" class="mr-1" />
+                {{ auth.user.name }}
+                <v-icon icon="mdi-chevron-down" size="18" class="ml-1" />
+              </v-btn>
+            </template>
+            <v-list rounded="lg" elevation="3">
+              <v-list-item v-if="auth.user.role === 'admin'" href="/admin/dashboard" prepend-icon="mdi-view-dashboard">
+                <v-list-item-title>Admin Panel</v-list-item-title>
+              </v-list-item>
+              <v-list-item href="/orders" prepend-icon="mdi-package-variant">
+                <v-list-item-title>My Orders</v-list-item-title>
+              </v-list-item>
+              <v-divider class="my-1" />
+              <v-list-item @click="logout" prepend-icon="mdi-logout" class="text-error">
+                <v-list-item-title>Logout</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </template>
+        <template v-else>
+          <v-btn href="/login" variant="text" color="primary" rounded="pill" class="ml-1">Login</v-btn>
+          <v-btn href="/register" variant="flat" color="primary" rounded="pill" class="ml-1" prepend-icon="mdi-account-plus">Register</v-btn>
+        </template>
+      </v-container>
+    </v-app-bar>
 
     <!-- Flash Messages -->
-    <div v-if="flash?.success" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-      <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md text-sm">
-        {{ flash.success }}
-      </div>
-    </div>
-    <div v-if="flash?.error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-      <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
-        {{ flash.error }}
-      </div>
-    </div>
+    <v-main>
+      <v-container v-if="flash?.success" style="max-width: 1200px;" class="pb-0">
+        <v-alert type="success" variant="tonal" closable rounded="lg" class="mb-0">{{ flash.success }}</v-alert>
+      </v-container>
+      <v-container v-if="flash?.error" style="max-width: 1200px;" class="pb-0">
+        <v-alert type="error" variant="tonal" closable rounded="lg" class="mb-0">{{ flash.error }}</v-alert>
+      </v-container>
 
-    <!-- Content -->
-    <main class="flex-1">
+      <!-- Content -->
       <slot />
-    </main>
+    </v-main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t mt-8">
-      <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <p class="text-center text-gray-500 text-sm">
+    <v-footer class="bg-grey-darken-4">
+      <v-container style="max-width: 1200px;">
+        <p class="text-body-2 text-grey-lighten-1 text-center ma-0 w-100">
           &copy; {{ new Date().getFullYear() }} {{ tenant?.name || 'Store' }}. Powered by Multi-Tenant eCommerce.
         </p>
-      </div>
-    </footer>
-  </div>
+      </v-container>
+    </v-footer>
+  </v-app>
 </template>
 
 <script setup>

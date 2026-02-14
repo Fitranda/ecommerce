@@ -53,9 +53,32 @@ class TenantRegistrationController extends Controller
             'domain' => $validated['subdomain'],
         ]);
 
+        // Auto-add subdomain to Windows hosts file for local development
+        $this->addToHostsFile($validated['subdomain'] . '.' . config('tenancy.central_domains')[0]);
+
         $tenantUrl = 'http://' . $validated['subdomain'] . '.' . config('tenancy.central_domains')[0];
 
-        return redirect()->away($tenantUrl)
-            ->with('success', 'Store created successfully! Please log in.');
+        return redirect()->away($tenantUrl . '/login?welcome=1');
+    }
+
+    /**
+     * Add subdomain to Windows hosts file for local development.
+     */
+    private function addToHostsFile(string $domain): void
+    {
+        if (PHP_OS_FAMILY !== 'Windows') {
+            return;
+        }
+
+        $hostsFile = 'C:\Windows\System32\drivers\etc\hosts';
+        $hostsContent = file_get_contents($hostsFile);
+
+        // Check if entry already exists
+        if (str_contains($hostsContent, $domain)) {
+            return;
+        }
+
+        // Try to append entry
+        @file_put_contents($hostsFile, "\n127.0.0.1 {$domain}", FILE_APPEND);
     }
 }

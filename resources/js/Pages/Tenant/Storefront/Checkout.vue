@@ -1,62 +1,48 @@
 <template>
   <StorefrontLayout>
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">Checkout</h1>
+    <v-container style="max-width: 1000px;" class="py-8">
+      <h1 class="text-h4 font-weight-bold mb-6" style="color: #1E1B4B;">
+        <v-icon icon="mdi-credit-card-check" color="primary" class="mr-2" />Checkout
+      </h1>
 
-      <div class="grid md:grid-cols-3 gap-8">
+      <v-row>
         <!-- Shipping Form -->
-        <div class="md:col-span-2">
-          <form @submit.prevent="submit" class="bg-white p-6 rounded-lg border space-y-5">
-            <h2 class="text-lg font-semibold text-gray-900">Shipping Information</h2>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-              <input v-model="form.shipping_name" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-              <p class="text-red-500 text-sm mt-1" v-if="form.errors.shipping_name">{{ form.errors.shipping_name }}</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-              <textarea v-model="form.shipping_address" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"></textarea>
-              <p class="text-red-500 text-sm mt-1" v-if="form.errors.shipping_address">{{ form.errors.shipping_address }}</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              <input v-model="form.shipping_phone" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-              <p class="text-red-500 text-sm mt-1" v-if="form.errors.shipping_phone">{{ form.errors.shipping_phone }}</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
-              <textarea v-model="form.notes" rows="2" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"></textarea>
-            </div>
-
-            <button type="submit" :disabled="form.processing" class="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition disabled:opacity-50">
-              {{ form.processing ? 'Placing Order...' : 'Place Order' }}
-            </button>
-          </form>
-        </div>
+        <v-col cols="12" md="7">
+          <v-card class="pa-6" variant="outlined" style="border: 2px solid #EDE9FE;">
+            <h2 class="text-h6 font-weight-bold mb-4" style="color: #1E1B4B;">
+              <v-icon icon="mdi-truck-delivery" color="secondary" class="mr-2" />Shipping Information
+            </h2>
+            <v-form @submit.prevent="submit">
+              <v-text-field v-model="form.shipping_name" label="Full Name" prepend-inner-icon="mdi-account" :error-messages="form.errors.shipping_name" class="mb-1" />
+              <v-textarea v-model="form.shipping_address" label="Address" prepend-inner-icon="mdi-map-marker" rows="3" :error-messages="form.errors.shipping_address" class="mb-1" />
+              <v-text-field v-model="form.shipping_phone" label="Phone" prepend-inner-icon="mdi-phone" :error-messages="form.errors.shipping_phone" class="mb-1" />
+              <v-textarea v-model="form.notes" label="Notes (optional)" prepend-inner-icon="mdi-note-text" rows="2" class="mb-4" />
+              <v-btn type="submit" color="primary" block size="large" :loading="form.processing" rounded="pill" prepend-icon="mdi-check-circle">
+                Place Order
+              </v-btn>
+            </v-form>
+          </v-card>
+        </v-col>
 
         <!-- Order Summary -->
-        <div>
-          <div class="bg-white p-6 rounded-lg border sticky top-24">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
-            <div class="space-y-3">
-              <div v-for="item in cart.items" :key="item.id" class="flex justify-between text-sm">
-                <span class="text-gray-600">{{ item.product.name }} x{{ item.quantity }}</span>
-                <span class="font-medium">${{ Number(item.subtotal).toFixed(2) }}</span>
-              </div>
-              <hr>
-              <div class="flex justify-between font-bold text-lg">
-                <span>Total</span>
-                <span class="text-indigo-600">${{ Number(cart.total).toFixed(2) }}</span>
-              </div>
+        <v-col cols="12" md="5">
+          <v-card class="pa-6 position-sticky" style="top: 88px; border: 2px solid #FEF3C7;" variant="outlined">
+            <h2 class="text-h6 font-weight-bold mb-4" style="color: #1E1B4B;">
+              <v-icon icon="mdi-receipt-text" color="secondary" class="mr-2" />Order Summary
+            </h2>
+            <div v-for="item in cart.items" :key="item.id" class="d-flex justify-space-between text-body-2 mb-2">
+              <span class="text-grey-darken-1">{{ item.product.name }} x{{ item.quantity }}</span>
+              <span class="font-weight-bold">${{ Number(item.subtotal).toFixed(2) }}</span>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            <v-divider class="my-3" />
+            <div class="d-flex justify-space-between">
+              <span class="text-h6 font-weight-bold" style="color: #1E1B4B;">Total</span>
+              <span class="text-h5 font-weight-black text-primary">${{ Number(cart.total).toFixed(2) }}</span>
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </StorefrontLayout>
 </template>
 

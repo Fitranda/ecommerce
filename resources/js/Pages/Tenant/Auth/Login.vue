@@ -1,45 +1,62 @@
 <template>
   <StorefrontLayout>
-    <div class="max-w-md mx-auto py-16 px-4">
-      <div class="bg-white p-8 rounded-lg shadow-sm border">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Sign In</h2>
+    <v-container style="max-width: 480px;" class="py-16">
+      <v-alert v-if="isWelcome" type="success" variant="tonal" rounded="lg" class="mb-6" closable>
+        <strong>Store created successfully!</strong> Please sign in with your admin credentials.
+      </v-alert>
 
-        <form @submit.prevent="submit" class="space-y-5">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input v-model="form.email" type="email" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.email">{{ form.errors.email }}</p>
-          </div>
+      <v-card class="pa-8" style="border: 2px solid #EDE9FE;">
+        <div class="text-center mb-6">
+          <v-avatar size="64" color="primary" variant="tonal" class="mb-3">
+            <v-icon icon="mdi-login" size="32" />
+          </v-avatar>
+          <h2 class="text-h5 font-weight-bold" style="color: #1E1B4B;">Sign In</h2>
+          <p class="text-body-2 text-grey-darken-1 mt-1">Welcome back to the store</p>
+        </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input v-model="form.password" type="password" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.password">{{ form.errors.password }}</p>
-          </div>
+        <v-form @submit.prevent="submit">
+          <v-text-field
+            v-model="form.email"
+            label="Email"
+            type="email"
+            prepend-inner-icon="mdi-email"
+            :error-messages="form.errors.email"
+            class="mb-1"
+          />
 
-          <div class="flex items-center justify-between">
-            <label class="flex items-center">
-              <input v-model="form.remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" />
-              <span class="ml-2 text-sm text-gray-600">Remember me</span>
-            </label>
-          </div>
+          <v-text-field
+            v-model="form.password"
+            label="Password"
+            type="password"
+            prepend-inner-icon="mdi-lock"
+            :error-messages="form.errors.password"
+            class="mb-2"
+          />
 
-          <button type="submit" :disabled="form.processing" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
-            {{ form.processing ? 'Signing in...' : 'Sign In' }}
-          </button>
+          <v-checkbox v-model="form.remember" label="Remember me" density="compact" class="mb-4" />
 
-          <p class="text-center text-sm text-gray-600">
-            Don't have an account? <a href="/register" class="text-indigo-600 hover:text-indigo-800">Register</a>
+          <v-btn type="submit" color="primary" block size="large" :loading="form.processing" rounded="pill" prepend-icon="mdi-login">
+            Sign In
+          </v-btn>
+
+          <p class="text-center text-body-2 text-grey-darken-1 mt-5">
+            Don't have an account? <a href="/register" class="text-primary font-weight-bold text-decoration-none">Register</a>
           </p>
-        </form>
-      </div>
-    </div>
+        </v-form>
+      </v-card>
+    </v-container>
   </StorefrontLayout>
 </template>
 
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import { useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const isWelcome = computed(() => {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('welcome') === '1';
+});
 
 const form = useForm({
   email: '',

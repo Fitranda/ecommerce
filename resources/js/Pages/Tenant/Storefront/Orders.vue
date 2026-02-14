@@ -1,41 +1,39 @@
 <template>
   <StorefrontLayout>
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">My Orders</h1>
+    <v-container style="max-width: 900px;" class="py-8">
+      <h1 class="text-h4 font-weight-bold mb-6" style="color: #1E1B4B;">
+        <v-icon icon="mdi-package-variant" color="primary" class="mr-2" />My Orders
+      </h1>
 
-      <div v-if="orders.data.length === 0" class="text-center py-12 text-gray-500">
-        <p>You haven't placed any orders yet.</p>
-        <a href="/products" class="mt-4 inline-block text-indigo-600 hover:text-indigo-800 font-medium">Start Shopping</a>
+      <div v-if="orders.data.length === 0" class="text-center py-16">
+        <v-icon icon="mdi-package-variant-remove" size="80" color="grey-lighten-2" />
+        <p class="text-h6 text-grey mt-4">You haven't placed any orders yet.</p>
+        <v-btn href="/products" color="primary" rounded="pill" class="mt-4" prepend-icon="mdi-shopping">Start Shopping</v-btn>
       </div>
 
-      <div v-else class="space-y-4">
-        <a v-for="order in orders.data" :key="order.id"
-           :href="`/orders/${order.id}`"
-           class="block bg-white rounded-lg border p-4 hover:shadow-md transition">
-          <div class="flex justify-between items-start">
+      <div v-else class="d-flex flex-column ga-3">
+        <v-card v-for="order in orders.data" :key="order.id" :href="`/orders/${order.id}`" hover variant="outlined" class="pa-5 order-card" style="border: 2px solid #EDE9FE;">
+          <div class="d-flex justify-space-between align-start">
             <div>
-              <p class="font-medium text-gray-900">{{ order.order_number }}</p>
-              <p class="text-sm text-gray-500 mt-1">{{ new Date(order.created_at).toLocaleDateString() }}</p>
+              <p class="text-subtitle-1 font-weight-bold" style="color: #1E1B4B;">{{ order.order_number }}</p>
+              <p class="text-body-2 text-grey-darken-1 mt-1">{{ new Date(order.created_at).toLocaleDateString() }}</p>
             </div>
             <div class="text-right">
-              <span :class="statusClass(order.status)" class="inline-flex px-2 py-1 text-xs font-medium rounded-full">
-                {{ order.status }}
-              </span>
-              <p class="text-lg font-bold text-indigo-600 mt-1">${{ Number(order.total_amount).toFixed(2) }}</p>
+              <v-chip :color="statusColor(order.status)" variant="flat" size="small" class="mb-2">{{ order.status }}</v-chip>
+              <p class="text-h6 font-weight-black text-primary">${{ Number(order.total_amount).toFixed(2) }}</p>
             </div>
           </div>
-        </a>
+        </v-card>
       </div>
 
       <!-- Pagination -->
-      <div v-if="orders.links && orders.links.length > 3" class="mt-8 flex justify-center space-x-1">
+      <div v-if="orders.links && orders.links.length > 3" class="d-flex justify-center mt-8 ga-1">
         <template v-for="link in orders.links" :key="link.label">
-          <a v-if="link.url" :href="link.url" v-html="link.label"
-             :class="[link.active ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50', 'px-3 py-2 border rounded-md text-sm']" />
-          <span v-else v-html="link.label" class="px-3 py-2 border rounded-md text-sm text-gray-400 bg-gray-50" />
+          <v-btn v-if="link.url" :href="link.url" :color="link.active ? 'primary' : 'grey-lighten-3'" :variant="link.active ? 'flat' : 'outlined'" size="small" rounded="lg" v-html="link.label" min-width="40" />
+          <v-btn v-else variant="text" size="small" disabled v-html="link.label" min-width="40" />
         </template>
       </div>
-    </div>
+    </v-container>
   </StorefrontLayout>
 </template>
 
@@ -46,13 +44,13 @@ defineProps({
   orders: Object,
 });
 
-function statusClass(status) {
-  const classes = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    processing: 'bg-blue-100 text-blue-800',
-    completed: 'bg-green-100 text-green-800',
-    cancelled: 'bg-red-100 text-red-800',
-  };
-  return classes[status] || 'bg-gray-100 text-gray-800';
+function statusColor(status) {
+  const map = { pending: 'warning', processing: 'info', completed: 'success', cancelled: 'error' };
+  return map[status] || 'grey';
 }
 </script>
+
+<style scoped>
+.order-card { transition: all 0.3s ease; }
+.order-card:hover { border-color: #7C3AED !important; transform: translateY(-2px); }
+</style>

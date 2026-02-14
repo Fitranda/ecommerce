@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tenant\Cart;
 use App\Models\Tenant\Category;
 use App\Models\Tenant\Product;
 use App\Models\Tenant\User;
@@ -13,11 +12,12 @@ class TenantDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create admin user
+        // Create admin user from tenant registration data
+        $tenant = tenant();
         User::create([
-            'name' => 'Store Admin',
-            'email' => 'admin@store.test',
-            'password' => Hash::make('password'),
+            'name' => $tenant->admin_name ?? 'Store Admin',
+            'email' => $tenant->admin_email ?? 'admin@store.test',
+            'password' => $tenant->admin_password ?? Hash::make('password'),
             'role' => 'admin',
         ]);
 

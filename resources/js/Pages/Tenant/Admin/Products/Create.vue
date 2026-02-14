@@ -2,71 +2,46 @@
   <AdminLayout>
     <template #header>Add Product</template>
 
-    <div class="max-w-2xl">
-      <form @submit.prevent="submit" class="bg-white p-6 rounded-lg border space-y-5">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-          <input v-model="form.name" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-          <p class="text-red-500 text-sm mt-1" v-if="form.errors.name">{{ form.errors.name }}</p>
-        </div>
+    <v-card variant="outlined" class="pa-6" style="max-width: 700px; border: 2px solid #EDE9FE;">
+      <v-form @submit.prevent="submit">
+        <v-text-field v-model="form.name" label="Name" prepend-inner-icon="mdi-package-variant" :error-messages="form.errors.name" class="mb-1" />
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-          <select v-model="form.category_id" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border">
-            <option value="">Select category</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-          </select>
-          <p class="text-red-500 text-sm mt-1" v-if="form.errors.category_id">{{ form.errors.category_id }}</p>
-        </div>
+        <v-select v-model="form.category_id" :items="categoryOptions" item-title="name" item-value="id" label="Category" prepend-inner-icon="mdi-tag" clearable :error-messages="form.errors.category_id" class="mb-1" />
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <textarea v-model="form.description" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"></textarea>
-          <p class="text-red-500 text-sm mt-1" v-if="form.errors.description">{{ form.errors.description }}</p>
-        </div>
+        <v-textarea v-model="form.description" label="Description" prepend-inner-icon="mdi-text" rows="4" :error-messages="form.errors.description" class="mb-1" />
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
-            <input v-model="form.price" type="number" step="0.01" min="0" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.price">{{ form.errors.price }}</p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-            <input v-model="form.stock" type="number" min="0" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border" />
-            <p class="text-red-500 text-sm mt-1" v-if="form.errors.stock">{{ form.errors.stock }}</p>
-          </div>
-        </div>
+        <v-row class="mb-1">
+          <v-col cols="6">
+            <v-text-field v-model="form.price" label="Price" type="number" step="0.01" min="0" prepend-inner-icon="mdi-currency-usd" :error-messages="form.errors.price" />
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="form.stock" label="Stock" type="number" min="0" prepend-inner-icon="mdi-archive" :error-messages="form.errors.stock" />
+          </v-col>
+        </v-row>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-          <input type="file" @change="form.image = $event.target.files[0]" accept="image/*" class="text-sm" />
-          <p class="text-red-500 text-sm mt-1" v-if="form.errors.image">{{ form.errors.image }}</p>
-        </div>
+        <v-file-input @update:model-value="form.image = $event" label="Image" prepend-icon="" prepend-inner-icon="mdi-camera" accept="image/*" :error-messages="form.errors.image" class="mb-1" />
 
-        <div class="flex items-center">
-          <input v-model="form.is_active" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" id="is_active" />
-          <label for="is_active" class="ml-2 text-sm text-gray-700">Active</label>
-        </div>
+        <v-checkbox v-model="form.is_active" label="Active" class="mb-4" />
 
-        <div class="flex justify-end space-x-3">
-          <a href="/admin/products" class="px-4 py-2 border rounded-md text-sm text-gray-700 hover:bg-gray-50">Cancel</a>
-          <button type="submit" :disabled="form.processing" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
-            {{ form.processing ? 'Saving...' : 'Save Product' }}
-          </button>
+        <div class="d-flex justify-end ga-3">
+          <v-btn href="/admin/products" variant="outlined" color="grey" rounded="pill">Cancel</v-btn>
+          <v-btn type="submit" color="primary" :loading="form.processing" rounded="pill" prepend-icon="mdi-content-save">Save Product</v-btn>
         </div>
-      </form>
-    </div>
+      </v-form>
+    </v-card>
   </AdminLayout>
 </template>
 
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
-defineProps({
+const props = defineProps({
   categories: { type: Array, default: () => [] },
 });
+
+const categoryOptions = computed(() => props.categories.map(c => ({ id: c.id, name: c.name })));
 
 const form = useForm({
   name: '',

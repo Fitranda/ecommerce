@@ -1,37 +1,42 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
-            <a :href="route('central.home')" class="text-xl font-bold text-indigo-600">
-              Multi-Store Platform
-            </a>
-          </div>
-          <div class="flex items-center space-x-4">
-            <a :href="route('central.register')" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition">
-              Create Your Store
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
+  <v-app>
+    <!-- Gradient Top Bar -->
+    <v-app-bar flat class="px-2" style="background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);">
+      <v-container class="d-flex align-center py-0" style="max-width: 1200px;">
+        <v-app-bar-title>
+          <a :href="route('central.home')" class="text-decoration-none d-flex align-center">
+            <v-icon icon="mdi-store" size="28" color="white" class="mr-2" />
+            <span class="text-h6 font-weight-bold text-white">Multi-Store Platform</span>
+          </a>
+        </v-app-bar-title>
+        <v-spacer />
+        <v-btn
+          :href="route('central.register')"
+          color="white"
+          variant="flat"
+          rounded="pill"
+          class="text-primary font-weight-bold"
+          prepend-icon="mdi-rocket-launch"
+        >
+          Create Your Store
+        </v-btn>
+      </v-container>
+    </v-app-bar>
 
     <!-- Content -->
-    <main>
+    <v-main>
       <slot />
-    </main>
+    </v-main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t mt-auto">
-      <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <p class="text-center text-gray-500 text-sm">
+    <v-footer class="bg-grey-darken-4 text-center" app>
+      <v-container>
+        <p class="text-body-2 text-grey-lighten-1 ma-0">
           &copy; {{ new Date().getFullYear() }} Multi-Tenant eCommerce Platform. All rights reserved.
         </p>
-      </div>
-    </footer>
-  </div>
+      </v-container>
+    </v-footer>
+  </v-app>
 </template>
 
 <script setup>

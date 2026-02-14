@@ -2,42 +2,38 @@
   <AdminLayout>
     <template #header>Product Details</template>
 
-    <div class="max-w-2xl bg-white rounded-lg border p-6">
-      <div class="flex items-start justify-between mb-6">
+    <v-card variant="outlined" class="pa-6" style="max-width: 700px; border: 2px solid #EDE9FE;">
+      <div class="d-flex justify-space-between align-start mb-6">
         <div>
-          <h2 class="text-xl font-bold text-gray-900">{{ product.name }}</h2>
-          <p class="text-sm text-gray-500">{{ product.category?.name }} &middot; {{ product.slug }}</p>
+          <h2 class="text-h5 font-weight-bold" style="color: #1E1B4B;">{{ product.name }}</h2>
+          <p class="text-body-2 text-grey-darken-1">{{ product.category?.name }} &middot; {{ product.slug }}</p>
         </div>
-        <span :class="product.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" class="inline-flex px-3 py-1 text-sm font-medium rounded-full">
-          {{ product.is_active ? 'Active' : 'Inactive' }}
-        </span>
+        <v-chip :color="product.is_active ? 'success' : 'grey'" variant="flat">{{ product.is_active ? 'Active' : 'Inactive' }}</v-chip>
       </div>
 
-      <div v-if="product.image" class="mb-6">
-        <img :src="`/storage/${product.image}`" class="w-48 h-48 object-cover rounded-lg" />
-      </div>
+      <v-img v-if="product.image" :src="`/storage/${product.image}`" width="200" height="200" cover rounded="xl" class="mb-6 border" />
 
-      <div class="grid grid-cols-2 gap-4 mb-6">
-        <div>
-          <p class="text-sm text-gray-500">Price</p>
-          <p class="text-lg font-bold text-indigo-600">${{ Number(product.price).toFixed(2) }}</p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500">Stock</p>
-          <p class="text-lg font-bold" :class="product.stock <= 5 ? 'text-orange-600' : 'text-gray-900'">{{ product.stock }}</p>
-        </div>
-      </div>
+      <v-row class="mb-6">
+        <v-col cols="6">
+          <p class="text-body-2 text-grey mb-1">Price</p>
+          <p class="text-h5 font-weight-black text-primary">${{ Number(product.price).toFixed(2) }}</p>
+        </v-col>
+        <v-col cols="6">
+          <p class="text-body-2 text-grey mb-1">Stock</p>
+          <p class="text-h5 font-weight-black" :class="product.stock <= 5 ? 'text-warning' : ''">{{ product.stock }}</p>
+        </v-col>
+      </v-row>
 
       <div v-if="product.description" class="mb-6">
-        <p class="text-sm text-gray-500 mb-1">Description</p>
-        <p class="text-gray-700 whitespace-pre-line">{{ product.description }}</p>
+        <p class="text-body-2 text-grey mb-1">Description</p>
+        <p class="text-body-1" style="white-space: pre-line; color: #1E1B4B;">{{ product.description }}</p>
       </div>
 
-      <div class="flex space-x-3">
-        <a :href="`/admin/products/${product.id}/edit`" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">Edit</a>
-        <a href="/admin/products" class="px-4 py-2 border rounded-md text-sm text-gray-700 hover:bg-gray-50">Back</a>
+      <div class="d-flex ga-3">
+        <v-btn :href="`/admin/products/${product.id}/edit`" color="primary" rounded="pill" prepend-icon="mdi-pencil">Edit</v-btn>
+        <v-btn href="/admin/products" variant="outlined" color="grey" rounded="pill">Back</v-btn>
       </div>
-    </div>
+    </v-card>
   </AdminLayout>
 </template>
 
