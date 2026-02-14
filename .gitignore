@@ -25,3 +25,6 @@ Thumbs.db
 
 # Docker
 mysql_data/
+
+# Tenant test databases (created by phpunit)
+/tenant_*
